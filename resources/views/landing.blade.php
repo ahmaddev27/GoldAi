@@ -49,12 +49,19 @@
         #recommendation ul { list-style-type: disc; padding-right: 1.5rem; margin-bottom: 1rem; }
         #recommendation li { margin-bottom: 0.25rem; }
         #recommendation strong { color: #fbbf24; }
+
+        /* Signal Badge Styles */
+        .signal-buy { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .signal-sell { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .signal-wait { background: linear-gradient(135deg, #64748b, #475569); }
+
+        .strength-bar { transition: width 0.5s ease-out; }
     </style>
 </head>
 
 <body class="min-h-screen text-slate-200 p-4 md:p-8">
 
-<div class="max-w-6xl mx-auto space-y-8">
+<div class="max-w-7xl mx-auto space-y-6">
 
     <!-- Header -->
     <header class="text-center space-y-4">
@@ -62,73 +69,97 @@
         <p class="text-slate-400 text-lg">تحليل سكالبينج احترافي للذهب XAU/USD – مخصص لحساب 100$</p>
         <div class="inline-flex items-center px-4 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-sm">
             <span class="w-2 h-2 bg-yellow-500 rounded-full ml-2 animate-pulse"></span>
-            استراتيجية سكالبينج | أهداف صغيرة | ستوب ضيق
+            🎯 سكالبينج | لوت 0.01 | مخاطرة 1.5%
         </div>
     </header>
 
-    <!-- ✅ WIDGET: خطة التداول السريعة (تظهر عند توفر البيانات) -->
-    <div id="tradePlanWidget" class="glass-card p-6 rounded-3xl hidden">
-        <div class="flex items-center gap-2 mb-4">
-            <div class="p-1.5 bg-green-500/20 rounded-lg">
-                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-5m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+    <!-- Signal Indicator (Shows direction) -->
+    <div id="signalBanner" class="hidden glass-card p-4 rounded-2xl">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span id="signalIcon" class="text-2xl">⚡</span>
+                <div>
+                    <span id="signalDirection" class="text-lg font-bold text-white">--</span>
+                    <span class="text-slate-400 mr-2">| قوة الإشارة:</span>
+                    <span id="signalStrength" class="text-yellow-400 font-bold">--/10</span>
+                </div>
             </div>
-            <h3 class="text-lg font-bold text-white">📊 خطة السكالبينج – تنفيذ فوري</h3>
-            <span class="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full mr-auto">لحساب 100$</span>
+            <div class="w-32 bg-slate-700 rounded-full h-2">
+                <div id="strengthBar" class="strength-bar h-2 rounded-full bg-yellow-500" style="width: 0%"></div>
+            </div>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-sm">
-            <div class="bg-white/5 p-3 rounded-xl">
-                <div class="text-slate-400 text-xs mb-1">منطقة الدخول</div>
-                <div id="planEntry" class="font-mono text-lg font-bold text-yellow-400">---</div>
+    </div>
+
+    <!-- ✅ WIDGET: خطة التداول السريعة -->
+    <div id="tradePlanWidget" class="hidden">
+        <div class="glass-card p-4 rounded-2xl">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="p-1.5 bg-green-500/20 rounded-lg">
+                    <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-5m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white">📊 خطة التداول - تنفيذ فوري</h3>
+                <span class="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full mr-auto">100$ Account</span>
             </div>
-            <div class="bg-white/5 p-3 rounded-xl">
-                <div class="text-slate-400 text-xs mb-1">TP1</div>
-                <div id="planTp1" class="font-mono text-green-400 font-bold">---</div>
-            </div>
-            <div class="bg-white/5 p-3 rounded-xl">
-                <div class="text-slate-400 text-xs mb-1">TP2</div>
-                <div id="planTp2" class="font-mono text-green-400 font-bold">---</div>
-            </div>
-            <div class="bg-white/5 p-3 rounded-xl">
-                <div class="text-slate-400 text-xs mb-1">TP3</div>
-                <div id="planTp3" class="font-mono text-green-400 font-bold">---</div>
-            </div>
-            <div class="bg-white/5 p-3 rounded-xl">
-                <div class="text-slate-400 text-xs mb-1">وقف خسارة</div>
-                <div id="planSl" class="font-mono text-red-400 font-bold">---</div>
-            </div>
-            <div class="bg-white/5 p-3 rounded-xl">
-                <div class="text-slate-400 text-xs mb-1">حجم اللوت</div>
-                <div id="planLot" class="font-mono text-blue-400 font-bold">---</div>
-            </div>
-            <div class="bg-white/5 p-3 rounded-xl">
-                <div class="text-slate-400 text-xs mb-1">المخاطرة</div>
-                <div id="planRisk" class="font-mono text-orange-400 font-bold">---</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-sm">
+                <div class="bg-white/5 p-3 rounded-xl">
+                    <div class="text-slate-400 text-xs mb-1">منطقة الدخول</div>
+                    <div id="planEntry" class="font-mono text-lg font-bold text-yellow-400">---</div>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl">
+                    <div class="text-slate-400 text-xs mb-1">TP1</div>
+                    <div id="planTp1" class="font-mono text-green-400 font-bold">---</div>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl">
+                    <div class="text-slate-400 text-xs mb-1">TP2</div>
+                    <div id="planTp2" class="font-mono text-green-400 font-bold">---</div>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl">
+                    <div class="text-slate-400 text-xs mb-1">TP3</div>
+                    <div id="planTp3" class="font-mono text-green-400 font-bold">---</div>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl">
+                    <div class="text-slate-400 text-xs mb-1">وقف خسارة</div>
+                    <div id="planSl" class="font-mono text-red-400 font-bold">---</div>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl">
+                    <div class="text-slate-400 text-xs mb-1">حجم اللوت</div>
+                    <div id="planLot" class="font-mono text-blue-400 font-bold">0.01</div>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl">
+                    <div class="text-slate-400 text-xs mb-1">المخاطرة</div>
+                    <div id="planRisk" class="font-mono text-orange-400 font-bold">1.5%</div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Main Dashboard -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
         <!-- Stats Sidebar -->
-        <div class="space-y-6">
+        <div class="space-y-4">
             <!-- Price Card -->
-            <div class="glass-card p-6 rounded-3xl">
-                <h3 class="text-slate-400 text-sm mb-1">السعر الحالي</h3>
+            <div class="glass-card p-5 rounded-2xl">
+                <h3 class="text-slate-400 text-sm mb-1">السعر الحالي XAU/USD</h3>
                 <div class="flex items-baseline gap-2">
                     <span id="price" class="text-4xl font-bold text-white">----.--</span>
                     <span class="text-slate-500">USD</span>
                 </div>
-                <div id="price-change" class="text-sm mt-2 flex items-center">
-                    <!-- Dynamic change indicator -->
+                <div class="flex items-center gap-2 mt-2 text-sm">
+                    <span class="text-slate-400">الاتجاه:</span>
+                    <span id="trendShort" class="font-bold text-cyan-400">--</span>
                 </div>
             </div>
 
-            <!-- Indicators Card -->
-            <div class="glass-card p-6 rounded-3xl space-y-4">
-                <h3 class="text-slate-400 text-sm border-b border-white/10 pb-2">المؤشرات الفنية (5 دقائق)</h3>
+            <!-- EMA Indicators -->
+            <div class="glass-card p-5 rounded-2xl space-y-3">
+                <h3 class="text-slate-400 text-sm border-b border-white/10 pb-2">📈 المتوسطات المتحركة (EMA)</h3>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">EMA 12</span>
+                    <span id="ema12" class="font-mono text-cyan-400">--</span>
+                </div>
                 <div class="flex justify-between items-center">
                     <span class="text-slate-300">EMA 20</span>
                     <span id="ema20" class="font-mono text-blue-400">--</span>
@@ -137,13 +168,61 @@
                     <span class="text-slate-300">EMA 50</span>
                     <span id="ema50" class="font-mono text-purple-400">--</span>
                 </div>
+            </div>
+
+            <!-- Oscillators -->
+            <div class="glass-card p-5 rounded-2xl space-y-3">
+                <h3 class="text-slate-400 text-sm border-b border-white/10 pb-2">📊 مؤشرات التذبذب</h3>
                 <div class="flex justify-between items-center">
-                    <span class="text-slate-300">RSI (14)</span>
-                    <span id="rsi" class="font-mono text-yellow-500">--</span>
+                    <span class="text-slate-300">RSI (1m)</span>
+                    <span id="rsi1m" class="font-mono text-yellow-500">--</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-slate-300">الاتجاه (1h)</span>
-                    <span id="trend1h" class="font-mono text-sky-400">--</span>
+                    <span class="text-slate-300">RSI (5m)</span>
+                    <span id="rsi5m" class="font-mono text-yellow-500">--</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">Stochastic</span>
+                    <span id="stochastic" class="font-mono text-pink-400">--</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">MACD</span>
+                    <span id="macd" class="font-mono text-indigo-400">--</span>
+                </div>
+            </div>
+
+            <!-- Volatility & Pivots -->
+            <div class="glass-card p-5 rounded-2xl space-y-3">
+                <h3 class="text-slate-400 text-sm border-b border-white/10 pb-2">📉 التقلب والمستويات</h3>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">ATR (14)</span>
+                    <span id="atr" class="font-mono text-orange-400">--</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">BB Upper</span>
+                    <span id="bbUpper" class="font-mono text-red-400">--</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">BB Middle</span>
+                    <span id="bbMiddle" class="font-mono text-slate-300">--</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-300">BB Lower</span>
+                    <span id="bbLower" class="font-mono text-green-400">--</span>
+                </div>
+                <div class="border-t border-white/10 pt-2 mt-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Pivot</span>
+                        <span id="pivot" class="font-mono text-white">--</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">R1</span>
+                        <span id="r1" class="font-mono text-red-400">--</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">S1</span>
+                        <span id="s1" class="font-mono text-green-400">--</span>
+                    </div>
                 </div>
             </div>
 
@@ -157,24 +236,24 @@
         </div>
 
         <!-- Analysis & Chart Area -->
-        <div class="lg:col-span-2 space-y-6">
+        <div class="lg:col-span-3 space-y-4">
             <!-- Chart -->
-            <div class="glass-card p-6 rounded-3xl h-[300px]">
+            <div class="glass-card p-4 rounded-2xl h-[250px]">
                 <canvas id="priceChart"></canvas>
             </div>
 
-            <!-- AI Recommendation (نظيفة بدون JSON) -->
-            <div class="glass-card p-8 rounded-3xl min-h-[400px]">
-                <div class="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
+            <!-- AI Recommendation -->
+            <div class="glass-card p-6 rounded-2xl min-h-[350px]">
+                <div class="flex items-center gap-3 mb-4 border-b border-white/10 pb-3">
                     <div class="p-2 bg-yellow-500/20 rounded-lg">
                         <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                     </div>
-                    <h2 class="text-xl font-bold text-white">توصية المحلل الذكي – سكالبينج</h2>
+                    <h2 class="text-xl font-bold text-white">توصية المحلل الذكي</h2>
                 </div>
                 <div id="recommendation" class="text-slate-300 leading-relaxed">
-                    <div class="flex flex-col items-center justify-center py-20 text-slate-500">
+                    <div class="flex flex-col items-center justify-center py-16 text-slate-500">
                         <svg class="w-12 h-12 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        اضغط على الزر أعلاه لبدء التحليل الفني
+                        <p>اضغط على الزر الجانبي لبدء التحليل</p>
                     </div>
                 </div>
             </div>
@@ -182,9 +261,9 @@
     </div>
 
     <!-- Footer -->
-    <footer class="text-center text-slate-500 text-sm pb-8">
+    <footer class="text-center text-slate-500 text-sm pb-6">
         <p>© 2026 Gold AI Scalper - جميع الحقوق محفوظة</p>
-        <p class="mt-1 text-xs">تنبيه: التداول ينطوي على مخاطر عالية. التحليلات المقدمة هي لأغراض استرشادية فقط.</p>
+        <p class="mt-1 text-xs">⚠️ تنبيه: التداول ينطوي على مخاطر عالية. النتائج السابقة ليست ضمانة للمستقبل.</p>
     </footer>
 </div>
 
@@ -210,43 +289,136 @@
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4,
-                    pointRadius: 0
+                    pointRadius: 2,
+                    pointBackgroundColor: '#eab308'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleColor: '#fbbf24',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1
+                    }
+                },
                 scales: {
-                    x: { display: false },
+                    x: { display: true, grid: { color: 'rgba(255,255,255,0.05)' } },
                     y: {
                         grid: { color: 'rgba(255, 255, 255, 0.05)' },
                         ticks: { color: '#64748b', font: { size: 10 } }
                     }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
                 }
             }
         });
     }
 
+    // تحديث مؤشر الإشارة
+    function updateSignalBanner(signal) {
+        const banner = document.getElementById('signalBanner');
+        const direction = document.getElementById('signalDirection');
+        const strength = document.getElementById('signalStrength');
+        const icon = document.getElementById('signalIcon');
+        const bar = document.getElementById('strengthBar');
+
+        if (!signal || signal.direction === 'WAIT') {
+            banner.classList.add('hidden');
+            return;
+        }
+
+        banner.classList.remove('hidden');
+        direction.innerText = signal.direction === 'BUY' ? '🟢 شراء' : '🔴 بيع';
+        strength.innerText = signal.strength + '/10';
+        icon.innerText = signal.direction === 'BUY' ? '📈' : '📉';
+
+        //强度的颜色和宽度
+        const percentage = (signal.strength / 10) * 100;
+        bar.style.width = percentage + '%';
+
+        if (signal.direction === 'BUY') {
+            bar.classList.remove('bg-red-500');
+            bar.classList.add('bg-green-500');
+        } else {
+            bar.classList.remove('bg-green-500');
+            bar.classList.add('bg-red-500');
+        }
+    }
+
     // تحديث ويدجت خطة التداول
     function updateTradePlanWidget(plan) {
+        const widget = document.getElementById('tradePlanWidget');
+
         if (plan) {
-            document.getElementById('planEntry').innerText = plan.entry_zone?.toFixed(2) || '---';
+            document.getElementById('planEntry').innerText = plan.entry?.toFixed(2) || plan.entry_zone?.toFixed(2) || '---';
             document.getElementById('planTp1').innerText = plan.tp1?.toFixed(2) || '---';
             document.getElementById('planTp2').innerText = plan.tp2?.toFixed(2) || '---';
             document.getElementById('planTp3').innerText = plan.tp3?.toFixed(2) || '---';
             document.getElementById('planSl').innerText = plan.sl?.toFixed(2) || '---';
             document.getElementById('planLot').innerText = plan.lot_size || '0.01';
-            document.getElementById('planRisk').innerHTML = (plan.risk_percent || '1.0') + '%';
-            document.getElementById('tradePlanWidget').classList.remove('hidden');
+            document.getElementById('planRisk').innerText = (plan.risk_percent || '1.5') + '%';
+            widget.classList.remove('hidden');
         } else {
-            document.getElementById('tradePlanWidget').classList.add('hidden');
+            widget.classList.add('hidden');
         }
+    }
+
+    // تحديث المؤشرات على الواجهة
+    function updateIndicators(data) {
+        // Price & Trend
+        document.getElementById('price').innerText = data.current_price?.toFixed(2) || '---';
+        document.getElementById('trendShort').innerText = data.trend_short || '--';
+
+        // EMA
+        if (data.indicators?.ema) {
+            document.getElementById('ema12').innerText = data.indicators.ema.ema12?.toFixed(2) || '--';
+            document.getElementById('ema20').innerText = data.indicators.ema.ema20?.toFixed(2) || '--';
+            document.getElementById('ema50').innerText = data.indicators.ema.ema50?.toFixed(2) || '--';
+        }
+
+        // RSI
+        if (data.indicators?.rsi) {
+            document.getElementById('rsi1m').innerText = data.indicators.rsi.rsi_1m || '--';
+            document.getElementById('rsi5m').innerText = data.indicators.rsi.rsi_5m || '--';
+        }
+
+        // Stochastic & MACD
+        document.getElementById('stochastic').innerText = data.indicators?.stochastic || '--';
+        document.getElementById('macd').innerText = data.indicators?.macd || '--';
+
+        // ATR
+        document.getElementById('atr').innerText = data.indicators?.atr || '--';
+
+        // Bollinger Bands
+        if (data.indicators?.bb) {
+            document.getElementById('bbUpper').innerText = data.indicators.bb.upper?.toFixed(2) || '--';
+            document.getElementById('bbMiddle').innerText = data.indicators.bb.middle?.toFixed(2) || '--';
+            document.getElementById('bbLower').innerText = data.indicators.bb.lower?.toFixed(2) || '--';
+        }
+
+        // Pivots
+        if (data.indicators?.pivots) {
+            document.getElementById('pivot').innerText = data.indicators.pivots.pivot?.toFixed(2) || '--';
+            document.getElementById('r1').innerText = data.indicators.pivots.R1?.toFixed(2) || '--';
+            document.getElementById('s1').innerText = data.indicators.pivots.S1?.toFixed(2) || '--';
+        }
+
+        // Time
+        document.getElementById('time').innerText = data.time || '--:--:--';
     }
 
     // جلب التحليل
     async function fetchAnalysis() {
-        // UI Loading State
         analyzeBtn.disabled = true;
         btnText.innerText = "جاري التحليل...";
         btnLoader.classList.remove('hidden');
@@ -256,29 +428,49 @@
             const response = await axios.get('/api/get-analysis');
             const data = response.data;
 
-            // تحديث المؤشرات الأساسية
-            document.getElementById('price').innerText = data.current_price.toFixed(2);
-            document.getElementById('ema20').innerText = data.ema20;
-            document.getElementById('ema50').innerText = data.ema50;
-            document.getElementById('rsi').innerText = data.rsi;
-            document.getElementById('trend1h').innerText = data.trend1h;
-            document.getElementById('time').innerText = data.time;
+            // التحقق من وجود خطأ
+            if (data.error) {
+                throw new Error(data.error);
+            }
 
-            // تحديث التوصية (Markdown)
-            recommendationDiv.innerHTML = marked.parse(data.recommendation);
+            // تحديث المؤشرات
+            updateIndicators(data);
+
+            // تحديث_signal Banner
+            updateSignalBanner(data.trading_signal);
+
+            // تحديث التوصية
+            if (data.recommendation) {
+                recommendationDiv.innerHTML = marked.parse(data.recommendation);
+            } else {
+                recommendationDiv.innerHTML = '<div class="text-yellow-400 p-4 bg-yellow-400/10 rounded-xl border border-yellow-400/20">⏳ جاري انتظار إشارة واضحة للدخول...</div>';
+            }
             recommendationDiv.style.opacity = '1';
 
-            // تحديث ويدجت خطة التداول
-            updateTradePlanWidget(data.trade_plan);
+            // تحديث خطة التداول
+            if (data.trade_plan) {
+                updateTradePlanWidget(data.trade_plan);
+            } else if (data.trade_setup) {
+                updateTradePlanWidget(data.trade_setup);
+            } else {
+                document.getElementById('tradePlanWidget').classList.add('hidden');
+            }
 
             // تحديث الرسم البياني
-            chart.data.datasets[0].data = data.chart_data;
-            chart.data.labels = data.chart_data.map((_, i) => i);
+            const chartData = data.chart_data_5m || data.chart_data || [];
+            chart.data.datasets[0].data = chartData;
+            chart.data.labels = chartData.map((_, i) => i);
             chart.update();
 
         } catch (error) {
             console.error(error);
-            recommendationDiv.innerHTML = `<div class="text-red-400 p-4 bg-red-400/10 rounded-xl border border-red-400/20">❌ حدث خطأ أثناء جلب البيانات. يرجى التأكد من إعدادات API والمحاولة لاحقاً.</div>`;
+            let errorMsg = '❌ حدث خطأ';
+            if (error.response?.data?.error) {
+                errorMsg += ': ' + error.response.data.error;
+            } else if (error.message) {
+                errorMsg += ': ' + error.message;
+            }
+            recommendationDiv.innerHTML = `<div class="text-red-400 p-4 bg-red-400/10 rounded-xl border border-red-400/20">${errorMsg}</div>`;
             recommendationDiv.style.opacity = '1';
         } finally {
             analyzeBtn.disabled = false;
@@ -290,10 +482,9 @@
     // Event Listeners
     analyzeBtn.addEventListener('click', fetchAnalysis);
 
-    // التشغيل التلقائي عند تحميل الصفحة
+    // التشغيل التلقائي
     window.onload = () => {
         initChart();
-        fetchAnalysis(); // تحليل فوري عند فتح الصفحة
     };
 </script>
 
