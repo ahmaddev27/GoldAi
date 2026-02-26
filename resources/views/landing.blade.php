@@ -73,6 +73,17 @@
         </div>
     </header>
 
+    <!-- ✅ Signal Type Badge -->
+    <div id="signalTypeBadge" class="hidden glass-card p-6 rounded-2xl text-center">
+        <div class="flex flex-col items-center gap-3">
+            <span id="signalBadgeIcon" class="text-5xl">⏳</span>
+            <div>
+                <div id="signalBadgeText" class="text-3xl font-bold text-slate-400">انتظار</div>
+                <div class="text-slate-400 mt-1">لا توصية واضحة حالياً</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Signal Indicator (Shows direction) -->
     <div id="signalBanner" class="hidden glass-card p-4 rounded-2xl">
         <div class="flex items-center justify-between">
@@ -92,44 +103,101 @@
 
     <!-- ✅ WIDGET: خطة التداول السريعة -->
     <div id="tradePlanWidget" class="hidden">
-        <div class="glass-card p-4 rounded-2xl">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="p-1.5 bg-green-500/20 rounded-lg">
-                    <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-5m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <div class="glass-card p-5 rounded-2xl">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="p-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
+                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold text-white">📊 خطة التداول - تنفيذ فوري</h3>
-                <span class="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full mr-auto">100$ Account</span>
+                <h3 class="text-xl font-bold text-white">📊 خطة التداول الموصى بها</h3>
+                <span id="planSignalType" class="mr-auto px-3 py-1 rounded-full text-sm font-bold bg-slate-700 text-slate-300">WAIT</span>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-sm">
-                <div class="bg-white/5 p-3 rounded-xl">
-                    <div class="text-slate-400 text-xs mb-1">منطقة الدخول</div>
-                    <div id="planEntry" class="font-mono text-lg font-bold text-yellow-400">---</div>
+
+            <!-- Entry Zone -->
+            <div class="mb-4 p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl border border-blue-500/20">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-blue-400">🎯</span>
+                        <span class="text-slate-300 font-medium">منطقة الدخول</span>
+                    </div>
+                    <div id="planEntry" class="text-2xl font-mono font-bold text-blue-400">---</div>
                 </div>
-                <div class="bg-white/5 p-3 rounded-xl">
-                    <div class="text-slate-400 text-xs mb-1">TP1</div>
-                    <div id="planTp1" class="font-mono text-green-400 font-bold">---</div>
+            </div>
+
+            <!-- Targets Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                <!-- TP1 -->
+                <div class="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-500/20">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-8 h-8 flex items-center justify-center bg-green-500/20 rounded-full text-green-400 font-bold text-sm">1</span>
+                        <span class="text-slate-300 text-sm">الهدف الأول</span>
+                    </div>
+                    <div id="planTp1" class="text-xl font-mono font-bold text-green-400 text-center">---</div>
+                    <div class="text-xs text-slate-500 text-center mt-1">Take Profit 1</div>
                 </div>
-                <div class="bg-white/5 p-3 rounded-xl">
-                    <div class="text-slate-400 text-xs mb-1">TP2</div>
-                    <div id="planTp2" class="font-mono text-green-400 font-bold">---</div>
+                <!-- TP2 -->
+                <div class="p-4 bg-gradient-to-r from-teal-500/10 to-green-500/10 rounded-xl border border-teal-500/20">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-8 h-8 flex items-center justify-center bg-teal-500/20 rounded-full text-teal-400 font-bold text-sm">2</span>
+                        <span class="text-slate-300 text-sm">الهدف الثاني</span>
+                    </div>
+                    <div id="planTp2" class="text-xl font-mono font-bold text-teal-400 text-center">---</div>
+                    <div class="text-xs text-slate-500 text-center mt-1">Take Profit 2</div>
                 </div>
-                <div class="bg-white/5 p-3 rounded-xl">
-                    <div class="text-slate-400 text-xs mb-1">TP3</div>
-                    <div id="planTp3" class="font-mono text-green-400 font-bold">---</div>
+                <!-- TP3 -->
+                <div class="p-4 bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-xl border border-emerald-500/20">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-8 h-8 flex items-center justify-center bg-emerald-500/20 rounded-full text-emerald-400 font-bold text-sm">3</span>
+                        <span class="text-slate-300 text-sm">الهدف الثالث</span>
+                    </div>
+                    <div id="planTp3" class="text-xl font-mono font-bold text-emerald-400 text-center">---</div>
+                    <div class="text-xs text-slate-500 text-center mt-1">Take Profit 3</div>
                 </div>
-                <div class="bg-white/5 p-3 rounded-xl">
-                    <div class="text-slate-400 text-xs mb-1">وقف خسارة</div>
-                    <div id="planSl" class="font-mono text-red-400 font-bold">---</div>
+            </div>
+
+            <!-- Stop Loss & Risk Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <!-- Stop Loss -->
+                <div class="p-4 bg-gradient-to-r from-red-500/10 to-rose-500/10 rounded-xl border border-red-500/20">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <span class="text-slate-300 font-medium">⚠️ وقف الخسارة</span>
+                    </div>
+                    <div id="planSl" class="text-2xl font-mono font-bold text-red-400 text-center">---</div>
+                    <div class="text-xs text-slate-500 text-center mt-1">Stop Loss - إغلاق فوري عند الوصول</div>
                 </div>
-                <div class="bg-white/5 p-3 rounded-xl">
-                    <div class="text-slate-400 text-xs mb-1">حجم اللوت</div>
-                    <div id="planLot" class="font-mono text-blue-400 font-bold">0.01</div>
+                <!-- Risk Info -->
+                <div class="p-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10 rounded-xl border border-orange-500/20">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span class="text-slate-300 font-medium">إدارة المخاطر</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-center">
+                            <div class="text-xs text-slate-400">حجم اللوت</div>
+                            <div id="planLot" class="text-lg font-mono font-bold text-orange-400">0.01</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xs text-slate-400">نسبة المخاطرة</div>
+                            <div id="planRisk" class="text-lg font-mono font-bold text-orange-400">1.5%</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white/5 p-3 rounded-xl">
-                    <div class="text-slate-400 text-xs mb-1">المخاطرة</div>
-                    <div id="planRisk" class="font-mono text-orange-400 font-bold">1.5%</div>
+            </div>
+
+            <!-- Signal Strength Bar -->
+            <div class="p-3 bg-white/5 rounded-xl">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-slate-400 text-sm">قوة الإشارة</span>
+                    <span id="planSignalStrength" class="text-yellow-400 font-bold">--/10</span>
+                </div>
+                <div class="w-full bg-slate-700 rounded-full h-3">
+                    <div id="planStrengthBar" class="h-3 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500" style="width: 0%"></div>
                 </div>
             </div>
         </div>
@@ -327,10 +395,31 @@
     // تحديث مؤشر الإشارة
     function updateSignalBanner(signal) {
         const banner = document.getElementById('signalBanner');
+        const badge = document.getElementById('signalTypeBadge');
         const direction = document.getElementById('signalDirection');
         const strength = document.getElementById('signalStrength');
         const icon = document.getElementById('signalIcon');
         const bar = document.getElementById('strengthBar');
+        const badgeIcon = document.getElementById('signalBadgeIcon');
+        const badgeText = document.getElementById('signalBadgeText');
+
+        // تحديث الـ Badge الرئيسي
+        if (badge) {
+            badge.classList.remove('hidden');
+            if (!signal || signal.direction === 'WAIT') {
+                badgeIcon.innerText = '⏳';
+                badgeText.innerText = 'انتظار';
+                badgeText.className = 'text-3xl font-bold text-slate-400';
+            } else if (signal.direction === 'BUY') {
+                badgeIcon.innerText = '📈';
+                badgeText.innerText = 'شراء';
+                badgeText.className = 'text-3xl font-bold text-green-400';
+            } else {
+                badgeIcon.innerText = '📉';
+                badgeText.innerText = 'بيع';
+                badgeText.className = 'text-3xl font-bold text-red-400';
+            }
+        }
 
         if (!signal || signal.direction === 'WAIT') {
             banner.classList.add('hidden');
@@ -356,10 +445,22 @@
     }
 
     // تحديث ويدجت خطة التداول
-    function updateTradePlanWidget(plan) {
+    function updateTradePlanWidget(plan, signal) {
         const widget = document.getElementById('tradePlanWidget');
 
-        if (plan) {
+        if (plan && signal && signal.direction !== 'WAIT') {
+            // تحديث نوع الإشارة
+            const signalTypeEl = document.getElementById('planSignalType');
+            if (signalTypeEl) {
+                if (signal.direction === 'BUY') {
+                    signalTypeEl.innerText = 'BUY - شراء';
+                    signalTypeEl.className = 'mr-auto px-3 py-1 rounded-full text-sm font-bold bg-green-500/20 text-green-400 border border-green-500/30';
+                } else {
+                    signalTypeEl.innerText = 'SELL - بيع';
+                    signalTypeEl.className = 'mr-auto px-3 py-1 rounded-full text-sm font-bold bg-red-500/20 text-red-400 border border-red-500/30';
+                }
+            }
+
             document.getElementById('planEntry').innerText = plan.entry?.toFixed(2) || plan.entry_zone?.toFixed(2) || '---';
             document.getElementById('planTp1').innerText = plan.tp1?.toFixed(2) || '---';
             document.getElementById('planTp2').innerText = plan.tp2?.toFixed(2) || '---';
@@ -367,6 +468,24 @@
             document.getElementById('planSl').innerText = plan.sl?.toFixed(2) || '---';
             document.getElementById('planLot').innerText = plan.lot_size || '0.01';
             document.getElementById('planRisk').innerText = (plan.risk_percent || '1.5') + '%';
+
+            // تحديث قوة الإشارة في الويدجت
+            const strengthEl = document.getElementById('planSignalStrength');
+            const strengthBar = document.getElementById('planStrengthBar');
+            if (strengthEl && signal.strength) {
+                strengthEl.innerText = signal.strength + '/10';
+            }
+            if (strengthBar && signal.strength) {
+                const percentage = (signal.strength / 10) * 100;
+                strengthBar.style.width = percentage + '%';
+
+                if (signal.direction === 'BUY') {
+                    strengthBar.className = 'h-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500';
+                } else {
+                    strengthBar.className = 'h-3 rounded-full bg-gradient-to-r from-red-500 to-rose-500 transition-all duration-500';
+                }
+            }
+
             widget.classList.remove('hidden');
         } else {
             widget.classList.add('hidden');
@@ -448,12 +567,21 @@
             recommendationDiv.style.opacity = '1';
 
             // تحديث خطة التداول
-            if (data.trade_plan) {
-                updateTradePlanWidget(data.trade_plan);
-            } else if (data.trade_setup) {
-                updateTradePlanWidget(data.trade_setup);
+            if (data.trade_plan && data.trading_signal) {
+                updateTradePlanWidget(data.trade_plan, data.trading_signal);
+            } else if (data.trade_setup && data.trading_signal) {
+                updateTradePlanWidget(data.trade_setup, data.trading_signal);
             } else {
                 document.getElementById('tradePlanWidget').classList.add('hidden');
+                document.getElementById('signalTypeBadge').classList.remove('hidden');
+                // إظهار حالة الانتظار
+                const badgeIcon = document.getElementById('signalBadgeIcon');
+                const badgeText = document.getElementById('signalBadgeText');
+                if (badgeIcon && badgeText) {
+                    badgeIcon.innerText = '⏳';
+                    badgeText.innerText = 'انتظار';
+                    badgeText.className = 'text-3xl font-bold text-slate-400';
+                }
             }
 
             // تحديث الرسم البياني
