@@ -366,15 +366,11 @@
                 <div id="btnSpin" class="spin" style="display:none;"></div>
             </button>
 
-            <!-- Auto refresh -->
-            <div style="display:flex;align-items:center;justify-content:space-between;
-                    padding:7px 11px;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;">
-                <span style="font-size:.72rem;color:var(--dim);">تحديث تلقائي كل 90s</span>
-                <label class="tog"><input type="checkbox" id="autoTog" checked><div class="tog-t"></div></label>
-            </div>
-
             <div style="text-align:center;font-size:.65rem;color:var(--dim);">
                 آخر تحليل: <span id="lastTime" class="mono">--:--</span>
+            </div>
+            <div style="text-align:center;font-size:.6rem;color:var(--dim);opacity:.7;">
+                💡 اضغط "تحليل الآن" لجلب أحدث سعر
             </div>
         </div>
 
@@ -424,7 +420,7 @@
     // ═══════════════════════════════════════════
     // STATE
     // ═══════════════════════════════════════════
-    let chart, autoTimer, autoRefresh = true;
+    let chart;
     let currentAsset = 'gold';
 
     // ═══════════════════════════════════════════
@@ -718,6 +714,7 @@
         dot.className = 'dot dwn';
         stTx.textContent = 'جارٍ التحليل...';
 
+        let rateLimited = false;
         try {
             const { data } = await axios.get(`/api/get-analysis?asset=${currentAsset}`, { timeout: 55000 });
             if (data.error) throw new Error(data.error);
@@ -743,22 +740,62 @@
             stTx.textContent = data.price_source === 'LIVE' ? 'سعر مباشر ✓' : 'سعر آخر شمعة';
 
         } catch (e) {
-            const msg = e.response?.data?.error || e.message || 'خطأ';
-            aOut.innerHTML = `<div style="color:var(--red);padding:11px;background:rgba(217,79,79,.05);
-                          border:1px solid rgba(217,79,79,.15);border-radius:8px;font-size:.8rem;">❌ ${msg}</div>`;
-            aOut.style.opacity = '1';
-            dot.className  = 'dot derr';
-            stTx.textContent = 'خطأ في الاتصال';
+            // ─── 429 Rate Limit handling ───
+            if (e.response?.status === 429 || e.response?.data?.error === 'RATE_LIMIT') {
+                rateLimited = true;
+                const rl = e.response.data || {};
+                const retryAfter = parseInt(rl.retry_after || 60, 10);
+                const suggestions = (rl.suggestions || []).map(s => `<li>${s}</li>`).join('');
+                aOut.innerHTML = `
+                    <div style="color:#e8b545;padding:13px;background:rgba(232,181,69,.07);
+                                border:1px solid rgba(232,181,69,.25);border-radius:9px;font-size:.78rem;">
+                        <div style="font-weight:700;margin-bottom:6px;">⚠️ تجاوز حد طلبات API</div>
+                        <div style="margin-bottom:8px;line-height:1.55;">${rl.error_ar || 'الخطة الحالية تسمح بـ 8 طلبات/دقيقة فقط'}</div>
+                        ${suggestions ? `<ul style="margin:6px 0 0 0;padding-inline-start:18px;line-height:1.7;font-size:.72rem;color:var(--dim);">${suggestions}</ul>` : ''}
+                        <div id="rlCountdown" style="margin-top:10px;font-weight:600;font-family:monospace;color:#e8b545;">
+                            ⏱ يمكنك المحاولة بعد: <span id="rlSec">${retryAfter}</span> ثانية
+                        </div>
+                    </div>`;
+                aOut.style.opacity = '1';
+                dot.className  = 'dot derr';
+                stTx.textContent = 'تجاوز حد الطلبات (429)';
+
+                // قفل الزر مع countdown
+                bTxt.textContent = `⏳ انتظار ${retryAfter}s`;
+                let sec = retryAfter;
+                const timer = setInterval(() => {
+                    sec--;
+                    const secEl = document.getElementById('rlSec');
+                    if (secEl) secEl.textContent = sec;
+                    bTxt.textContent = `⏳ انتظار ${sec}s`;
+                    if (sec <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        bTxt.textContent = '🔍 تحليل الآن';
+                    }
+                }, 1000);
+            } else {
+                // ─── أخطاء أخرى ───
+                const msg = e.response?.data?.error_ar || e.response?.data?.error || e.message || 'خطأ';
+                aOut.innerHTML = `<div style="color:var(--red);padding:11px;background:rgba(217,79,79,.05);
+                              border:1px solid rgba(217,79,79,.15);border-radius:8px;font-size:.8rem;">❌ ${msg}</div>`;
+                aOut.style.opacity = '1';
+                dot.className  = 'dot derr';
+                stTx.textContent = 'خطأ في الاتصال';
+            }
         } finally {
-            btn.disabled = false;
-            bTxt.textContent = '🔍 تحليل الآن';
             bSp.style.display = 'none';
             aSp.style.display = 'none';
+            // عند 429، الزر يبقى مقفلاً حتى ينتهي الـ countdown
+            if (!rateLimited) {
+                btn.disabled = false;
+                bTxt.textContent = '🔍 تحليل الآن';
+            }
         }
     }
 
     // ═══════════════════════════════════════════
-    // AUTO REFRESH + INIT
+    // INIT (بدون تحديث تلقائي — يدوي فقط)
     // ═══════════════════════════════════════════
     document.addEventListener('DOMContentLoaded', () => {
         initChart();
@@ -771,15 +808,7 @@
         checkLayout();
         window.addEventListener('resize', checkLayout);
 
-        // Auto refresh — 90 ثانية فقط
-        document.getElementById('autoTog').addEventListener('change', e => {
-            autoRefresh = e.target.checked;
-            if (autoTimer) clearInterval(autoTimer);
-            if (autoRefresh) autoTimer = setInterval(fetchAnalysis, 90000);
-        });
-        autoTimer = setInterval(() => { if (autoRefresh) fetchAnalysis(); }, 90000);
-
-        // تحليل أولي
+        // تحليل أولي عند فتح الصفحة فقط — لا تحديث تلقائي بعد ذلك
         setTimeout(fetchAnalysis, 800);
     });
 </script>
